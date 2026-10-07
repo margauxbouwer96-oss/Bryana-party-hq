@@ -14,6 +14,7 @@ const state = {
   startedAt: null,
   preview: false,
   testMode: localStorage.getItem('party_test_mode') === '1',
+  itineraryPreviewTime: localStorage.getItem('party_itinerary_preview_time') || 'live',
 };
 
 const esc = (s) =>
@@ -38,24 +39,54 @@ function setTestMode(on) {
   localStorage.setItem('party_test_mode', on ? '1' : '0');
 }
 
-function icon(name) {
-  const map = {
-    home: '⌂',
-    itinerary: '🗓',
-    mission: '💋',
-    olympics: '◎',
-    quiz: '✏',
-    gallery: '📷',
-    rules: '♛',
-    hits: '✦',
-    back: '‹',
-    cake: '🎂',
-    house: '⌂',
-    drinks: '🥂',
-    quizsmall: '✏',
-    games: '🎲',
+function icon(name, extra = '') {
+  const common = `class="doodle-icon ${extra}" viewBox="0 0 48 48" aria-hidden="true"`;
+  const icons = {
+    home: `<svg ${common}><path d="M7 23.5 24 8l17 15.5"/><path d="M11 21v19h10V29h6v11h10V21"/></svg>`,
+    itinerary: `<svg ${common}><rect x="7" y="10" width="34" height="31" rx="5"/><path d="M15 6v9M33 6v9M7 19h34M15 25h5M27 25h5M15 32h5M27 32h5"/></svg>`,
+    mission: `<svg ${common}><path d="M8 28c8-13 14-15 20-9 6-6 11-4 13 2-6 1-9 5-13 9-6 5-13 7-20-2Z"/><path d="M13 28c8 2 15 2 23-4"/></svg>`,
+    olympics: `<svg ${common}><circle cx="13" cy="24" r="8"/><circle cx="24" cy="24" r="8"/><circle cx="35" cy="24" r="8"/><circle cx="18.5" cy="32" r="8"/><circle cx="29.5" cy="32" r="8"/></svg>`,
+    quiz: `<svg ${common}><path d="M10 35 34 11l4 4-24 24-8 2 4-6Z"/><path d="m31 14 4 4"/></svg>`,
+    gallery: `<svg ${common}><rect x="7" y="14" width="34" height="25" rx="4"/><path d="M15 14l3-5h12l3 5"/><circle cx="24" cy="26" r="7"/></svg>`,
+    rules: `<svg ${common}><path d="m8 18 8 7 8-13 8 13 8-7-3 20H11Z"/><path d="M14 38h20"/></svg>`,
+    hits: `<svg ${common}><path d="M24 5 29 18h14L32 26l4 14-12-8-12 8 4-14L5 18h14Z"/></svg>`,
+    cake: `<svg ${common}><path d="M12 21h24v18H12Z"/><path d="M10 26c5 4 9-4 14 0s9-4 14 0"/><path d="M17 21v-7M24 21v-9M31 21v-7"/><path d="M15 12c0-3 2-5 2-5s2 2 2 5M22 10c0-3 2-5 2-5s2 2 2 5M29 12c0-3 2-5 2-5s2 2 2 5"/></svg>`,
+    house: `<svg ${common}><path d="M6 24 24 8l18 16"/><path d="M11 22v18h26V22M20 40V29h8v11"/></svg>`,
+    drinks: `<svg ${common}><path d="M8 9h13l-2 13c-1 5-9 5-10 0L8 9Z"/><path d="M14 27v10M10 37h8"/><path d="M27 11h13l-2 11c-1 5-9 5-10 0l-1-11Z"/><path d="M33 27v10M29 37h8"/></svg>`,
+    food: `<svg ${common}><path d="M11 7v15M16 7v15M6 7v15M11 22v19M33 7v34M29 7c0 8 8 8 8 0"/></svg>`,
+    lips: `<svg ${common}><path d="M6 25c8-12 14-13 18-6 5-7 12-6 18 6-9 10-26 10-36 0Z"/><path d="M9 25c10 2 20 2 30 0"/></svg>`,
+    cocktail: `<svg ${common}><path d="M7 10h34L24 27Z"/><path d="M24 27v11M16 40h16"/><path d="m31 14 8-7"/></svg>`,
+    cup: `<svg ${common}><path d="M14 16h20l-2 25H16Z"/><path d="M17 12h14M21 12V7h6v5"/><path d="m29 19 9-10"/></svg>`,
+    globe: `<svg ${common}><circle cx="24" cy="24" r="17"/><path d="M7 24h34M24 7c7 7 7 27 0 34M24 7c-7 7-7 27 0 34M11 15h26M11 33h26"/></svg>`,
+    lock: `<svg ${common}><rect x="11" y="20" width="26" height="21" rx="4"/><path d="M17 20v-6a7 7 0 0 1 14 0v6M24 28v6"/></svg>`,
+    star: `<svg ${common}><path d="m24 5 5 13h14l-11 8 4 14-12-8-12 8 4-14-11-8h14Z"/></svg>`,
+    crown: `<svg ${common}><path d="m7 18 9 7 8-15 8 15 9-7-4 20H11Z"/><path d="M12 38h24"/></svg>`,
+    martini: `<svg ${common}><path d="M7 10h34L24 27Z"/><path d="M24 27v11M16 40h16"/><path d="m31 14 8-7"/></svg>`,
+    camera: `<svg ${common}><rect x="7" y="15" width="34" height="24" rx="4"/><path d="M15 15l3-5h12l3 5"/><circle cx="24" cy="27" r="7"/></svg>`,
+    heart: `<svg ${common}><path d="M24 40S7 30 7 18c0-7 9-10 17-1 8-9 17-6 17 1 0 12-17 22-17 22Z"/></svg>`,
+    lightning: `<svg ${common}><path d="M26 5 11 27h11l-2 16 17-25H26Z"/></svg>`,
+    sunglasses: `<svg ${common}><path d="M6 17h36M10 19c1 10 11 12 16 3M38 19c-1 10-11 12-16 3"/></svg>`,
+    arrow: `<svg ${common}><path d="M8 24h30M29 14l10 10-10 10"/></svg>`,
   };
-  return map[name] || '✦';
+  return icons[name] || icons.star;
+}
+
+const guestIconMap = {
+  amber: 'martini', bryana: 'crown', charlie: 'globe', dara: 'lightning', joe: 'star', jon: 'sunglasses',
+  kelsey: 'martini', lorena: 'star', maddie: 'lightning', margaux: 'crown', marine: 'globe', natalia: 'heart',
+  natalie: 'camera', penny: 'heart', rita: 'martini', stasa: 'star', steve: 'camera'
+};
+
+function scrapbookDecor() {
+  return `
+    <div class="scrap-decor scrap-top-left"></div>
+    <div class="scrap-decor scrap-top-right"></div>
+    <div class="scrap-decor scrap-bottom-left"></div>
+    <div class="scribble scribble-1">♡</div>
+    <div class="scribble scribble-2">☆</div>
+    <div class="scribble scribble-3">♡</div>
+    <div class="scribble scribble-4">✦</div>
+  `;
 }
 
 function shell(inner, options = {}) {
@@ -64,6 +95,7 @@ function shell(inner, options = {}) {
     <div class="site-wrap ${noFrame ? 'no-frame' : ''}">
       <div class="phone-shell ${bodyClass}">
         ${state.testMode ? '<div class="test-banner">TEST MODE · quiz scores will not be saved</div>' : ''}
+        ${scrapbookDecor()}
         ${inner}
       </div>
     </div>
@@ -159,21 +191,18 @@ async function renderGuestPicker() {
     ${headerHome()}
     <section class="content-stack">
       ${infoCard(`
-        <div class="picker-stamp">CLASSIFIED GUEST LIST</div>
-        <h2 class="card-heading">WHO ARE YOU?</h2>
-        <p class="picker-copy">Find your classified file. This phone will remember you.</p>
+        <div class="picker-divider"><span>CLASSIFIED GUEST LIST</span></div>
+        <div class="picker-heading">${blockTitle('WHO ARE YOU?')}</div>
+        <p class="picker-copy hand-note">Find your file. This phone will remember you.</p>
         <div class="guest-search-wrap"><span>⌕</span><input id="guestSearch" class="guest-search" type="search" placeholder="Search your name…" /></div>
         <button class="small-toggle" id="toggleTest">${state.testMode ? 'Disable' : 'Enable'} organizer test mode</button>
       `, 'intro-card guest-intro')}
       <div class="guest-list" id="guestList">
         ${(data || []).map((g, index) => `
           <button class="guest-card guest-card-${index % 4}" data-guest="${g.slug}">
-            <span class="guest-tape"></span>
-            <span class="guest-number">FILE ${String(index + 1).padStart(2, '0')}</span>
-            <span class="guest-file-label">CONFIDENTIAL</span>
-            <strong>${esc(g.name)}</strong>
-            <span class="guest-role">${esc(g.title || 'CLASSIFIED FILE')}</span>
-            <span class="guest-arrow">→</span>
+            <span class="guest-icon">${icon(guestIconMap[g.slug] || 'star')}</span>
+            <span class="guest-card-copy"><strong>${esc(g.name)}</strong><span class="guest-role">${esc(g.title || 'CLASSIFIED FILE')}</span></span>
+            <span class="guest-arrow">${icon('arrow')}</span>
           </button>
         `).join('')}
       </div>
@@ -242,15 +271,15 @@ async function renderHome() {
 
 function timelineIcon(title = '') {
   const t = String(title).toLowerCase();
-  if (t.includes('brunch')) return '🍴';
-  if (t.includes('little orange door')) return '💋';
-  if (t.includes('simmons')) return '🍸';
-  if (t.includes('hq') || t.includes('house')) return '⌂';
-  if (t.includes('sit with us') || t.includes('dinner') || t.includes('snack')) return '🥤';
-  if (t.includes('pop quiz') || t.includes('bryana files')) return '✏️';
-  if (t.includes('cake')) return '🎂';
-  if (t.includes('archer')) return '♬';
-  return '✦';
+  if (t.includes('brunch')) return icon('food');
+  if (t.includes('little orange door')) return icon('lips');
+  if (t.includes('simmons')) return icon('cocktail');
+  if (t.includes('hq') || t.includes('house')) return icon('house');
+  if (t.includes('sit with us') || t.includes('dinner') || t.includes('snack')) return icon('cup');
+  if (t.includes('pop quiz') || t.includes('bryana files')) return icon('quiz');
+  if (t.includes('cake')) return icon('cake');
+  if (t.includes('archer')) return icon('globe');
+  return icon('star');
 }
 
 function startTimeOnly(label = '') {
@@ -268,8 +297,14 @@ async function renderItinerary() {
   const londonParts = new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false,
   }).formatToParts(now).reduce((acc, part) => ({ ...acc, [part.type]: part.value }), {});
-  const londonDate = `${londonParts.year}-${londonParts.month}-${londonParts.day}`;
-  const londonMinutes = Number(londonParts.hour) * 60 + Number(londonParts.minute);
+  let londonDate = `${londonParts.year}-${londonParts.month}-${londonParts.day}`;
+  let londonMinutes = Number(londonParts.hour) * 60 + Number(londonParts.minute);
+
+  if (state.testMode && isBryana && state.itineraryPreviewTime !== 'live') {
+    londonDate = partyDate;
+    const [h, m] = state.itineraryPreviewTime.split(':').map(Number);
+    londonMinutes = h * 60 + m;
+  }
 
   const isUnlockedForBryana = (item, index) => {
     if (!isBryana) return true;
@@ -285,7 +320,7 @@ async function renderItinerary() {
   shell(`
     ${screenHeader('ITINERARY', isBryana ? 'Classified until it is time…' : 'The plan (so far...)')}
     <section class="content-stack">
-      ${isBryana ? '<div class="classified-intro"><span>TOP SECRET</span> Your next stop reveals itself as the day unfolds.</div>' : ''}
+      ${isBryana ? `<div class="classified-intro"><span>TOP SECRET</span> Your next stop reveals itself as the day unfolds.</div>${state.testMode ? `<div class="time-preview-control"><label for="itineraryPreview">TEST UNLOCK TIME</label><select id="itineraryPreview"><option value="live">Live time</option>${rows.map(i => `<option value="${esc(startTimeOnly(i.time_label))}">${esc(startTimeOnly(i.time_label))}</option>`).join('')}</select><small>Use this to preview exactly what Bryana will see at each point in the day.</small></div>` : ''}` : ''}
       <div class="timeline-card">
         ${rows.map((item, index) => {
           const unlocked = isUnlockedForBryana(item, index);
@@ -307,13 +342,23 @@ async function renderItinerary() {
                 <div class="timeline-title">CLASSIFIED</div>
                 <div class="timeline-sub">Unlocks at ${esc(startTimeOnly(item.time_label))}</div>
               </div>
-              <div class="timeline-right"><span class="itinerary-icon">🔒</span></div>
+              <div class="timeline-right"><span class="itinerary-icon">${icon('lock')}</span></div>
             </div>
           `;
         }).join('')}
       </div>
     </section>
   `);
+
+  const preview = document.getElementById('itineraryPreview');
+  if (preview) {
+    preview.value = state.itineraryPreviewTime;
+    preview.onchange = () => {
+      state.itineraryPreviewTime = preview.value;
+      localStorage.setItem('party_itinerary_preview_time', preview.value);
+      renderItinerary();
+    };
+  }
 }
 
 async function renderMission() {
@@ -326,7 +371,7 @@ async function renderMission() {
     <section class="content-stack">
       <div class="mission-instruction">Complete it before the end of the night.</div>
       <div class="mission-card">
-        <div class="mission-icon">👥</div>
+        <div class="mission-icon">${icon('heart')}</div>
         <div class="mission-copy sans-copy">${esc(missionText)}</div>
       </div>
       <div class="upload-wrap">
@@ -363,7 +408,7 @@ async function renderMission() {
 
 function challengeStatus(row, index) {
   const raw = (row.status || row.progress_status || '').toLowerCase();
-  if (raw.includes('lock')) return { label: 'Locked', className: 'locked', icon: '🔒' };
+  if (raw.includes('lock')) return { label: 'Locked', className: 'locked', icon: icon('lock') };
   if (raw.includes('complete') || row.is_completed || row.completed_at) return { label: 'Completed', className: 'complete', icon: '✓' };
   return { label: index === 0 ? 'Completed' : 'In progress', className: index === 0 ? 'complete' : 'progress', icon: index === 0 ? '✓' : '•' };
 }
@@ -420,7 +465,7 @@ async function renderQuizLanding() {
     <section class="content-stack">
       ${infoCard(`
         <div class="quiz-intro">
-          <div class="timer-chip">✏️ Most correct + fastest wins</div>
+          <div class="timer-chip">${icon('quiz')}<span>Most correct + fastest wins</span></div>
           <p class="plain-note">${state.testMode ? 'You are in Test Mode. Results will not be saved.' : 'Ready? Your result locks once submitted.'}</p>
           <button class="primary-button" id="startQuiz">${state.testMode ? 'Preview the quiz' : 'Start quiz'}</button>
           <button class="secondary-button" id="viewBoard">View leaderboard</button>
@@ -466,7 +511,7 @@ function renderQuestion(index) {
     ${screenHeader('BRYANA FILES', 'How well do you know Bryana?')}
     <section class="content-stack quiz-stack">
       <div class="timer-row">
-        <div class="timer-box">⏱ <span>Time elapsed</span> <strong id="quizTimer">${quizElapsed()}</strong></div>
+        <div class="timer-box"><span class="timer-clock">○</span><span>Time elapsed</span><strong id="quizTimer">${quizElapsed()}</strong></div>
       </div>
       <div class="question-card">
         <div class="question-number">${index + 1}. ${esc(q.question)}</div>
