@@ -958,3 +958,279 @@ body {
   .hero-panel { min-height:335px; }
   .picker-heading .letter-block { font-size:17px; min-width:19px; }
 }
+
+/* =========================================================
+   V6 POLISH — approved scrapbook direction
+   ========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Reenie+Beanie&family=Schoolbell&display=swap');
+
+:root {
+  --pink-hot: #f43d88;
+  --pink: #ef76aa;
+  --pink-soft: #f7b9d0;
+  --pink-pale: #fde4ee;
+  --paper: #fffaf7;
+}
+
+/* Slightly larger supporting copy for legibility */
+.menu-caption { font-size: 15px !important; line-height: 1.15; }
+.guest-role { font-size: 17px !important; line-height: 1.05 !important; }
+.timeline-sub { font-size: 13px !important; line-height: 1.25; }
+.timeline-location { font-size: 11px !important; }
+.story-copy { font-size: 14px; }
+.story-by { font-size: 12px; }
+.empty-state { font-size: 13px; }
+.classified-intro { font-size: 13px; }
+.time-preview-control small { font-size: 12px; }
+
+/* Handwritten copy: rougher pencil/marker character, less polished script */
+.hand-note,
+.tagline,
+.screen-subtitle,
+.center-note,
+.picker-copy,
+.menu-caption,
+.identity-title,
+.guest-role {
+  font-family: 'Schoolbell', 'Segoe Print', 'Bradley Hand', cursive !important;
+}
+
+/* Main Bryana's note — torn, layered and pencil-like */
+.bryana-note {
+  isolation: isolate;
+  margin-left: 12px !important;
+  padding: 12px 22px 16px !important;
+  background: #f8bdd3 !important;
+  transform: rotate(-4.5deg) !important;
+  clip-path: polygon(
+    1% 15%, 7% 4%, 15% 11%, 24% 1%, 34% 10%, 45% 2%,
+    55% 12%, 66% 1%, 76% 10%, 87% 3%, 99% 14%,
+    97% 85%, 90% 96%, 81% 89%, 71% 100%, 61% 91%,
+    51% 99%, 40% 89%, 30% 99%, 20% 90%, 10% 98%, 2% 88%
+  ) !important;
+  filter: drop-shadow(4px 5px 0 rgba(232,117,159,.24));
+}
+.bryana-note::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 5px -8px -8px 8px;
+  background: rgba(255,255,255,.78);
+  transform: rotate(1.8deg);
+  clip-path: polygon(0 12%,9% 3%,18% 13%,29% 0,40% 12%,53% 2%,65% 14%,78% 1%,91% 12%,100% 5%,98% 89%,87% 100%,74% 88%,61% 99%,48% 88%,35% 100%,22% 89%,9% 99%,0 88%);
+}
+.bryana-note::after {
+  content: '' !important;
+  position: absolute !important;
+  left: 16px !important;
+  right: 12px !important;
+  bottom: 8px !important;
+  height: 3px !important;
+  background: rgba(190,54,107,.24) !important;
+  transform: rotate(-1deg) !important;
+  clip-path: none !important;
+}
+.bryana-note span {
+  font-family: 'Reenie Beanie', 'Schoolbell', cursive !important;
+  font-size: 63px !important;
+  font-weight: 400 !important;
+  line-height: .82 !important;
+  letter-spacing: .005em !important;
+  color: #dd2f73 !important;
+  text-shadow: .6px .4px 0 rgba(154,29,78,.22) !important;
+  transform: rotate(-1deg);
+}
+
+/* Stronger paper depth throughout */
+.phone-shell {
+  background:
+    radial-gradient(circle at 14% 9%, rgba(244,61,136,.045) 0 2px, transparent 2.7px),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(150,106,121,.075) 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, rgba(150,106,121,.065) 31px 32px),
+    #fffaf7 !important;
+}
+.hero-panel::after,
+.screen-header::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -10px;
+  right: -10px;
+  bottom: -3px;
+  height: 24px;
+  background: rgba(255,255,255,.92);
+  clip-path: polygon(0 42%,5% 13%,11% 47%,17% 6%,24% 44%,31% 10%,39% 52%,47% 5%,55% 45%,63% 9%,71% 50%,79% 3%,87% 43%,94% 12%,100% 48%,100% 100%,0 100%);
+  filter: drop-shadow(0 4px 2px rgba(80,45,60,.08));
+}
+
+/* Keep decorative doodles away from copy and headings */
+.doodle { z-index: 1 !important; opacity: .92; }
+.hero-panel .heart-a { right: 10px !important; top: 95px !important; }
+.hero-panel .heart-b { right: 17px !important; bottom: 28px !important; }
+.hero-panel .star-a { right: 20px !important; top: 190px !important; }
+.hero-panel .star-b { left: 8px !important; bottom: 32px !important; }
+.hero-panel .mini-cross-a { left: 8px !important; top: 220px !important; }
+.hero-panel .squiggle-a { right: 18px !important; top: 255px !important; }
+.hero-panel .paperclip-a { right: 18px !important; top: 20px !important; }
+
+.screen-header .heart-a { right: 12px !important; top: 70px !important; }
+.screen-header .heart-b { right: 18px !important; bottom: 8px !important; }
+.screen-header .star-a { right: 8px !important; top: 122px !important; }
+.screen-header .star-b { left: 8px !important; bottom: 7px !important; }
+.screen-header .mini-cross-a { left: 8px !important; top: 72px !important; }
+.screen-header .squiggle-a { right: 62px !important; top: 20px !important; }
+.screen-header .paperclip-a { right: 22px !important; top: 15px !important; }
+
+.title-stack,
+.date-kicker,
+.tagline,
+.black-strip,
+.screen-title-wrap,
+.screen-subtitle,
+.back-link {
+  position: relative;
+  z-index: 4;
+}
+
+/* More breathing room around headings so decorations never collide */
+.hero-block-title { margin: 13px 8px 0 4px !important; }
+.screen-title-wrap { margin-right: 42px !important; }
+.screen-subtitle {
+  display: inline-block;
+  max-width: calc(100% - 48px);
+  position: relative;
+  z-index: 4;
+  padding: 2px 6px 3px 2px;
+  background: rgba(255,250,247,.72);
+  border-radius: 8px;
+}
+
+/* Guest cards: icon lives INSIDE its own pink panel, never under text */
+.guest-card {
+  grid-template-columns: 62px minmax(0,1fr) 28px;
+  display: grid !important;
+  align-items: center !important;
+  gap: 13px !important;
+  padding: 10px 12px 10px 10px !important;
+  overflow: visible !important;
+  border-radius: 18px !important;
+  box-shadow: 2px 4px 0 #f3ccdb, 0 8px 18px rgba(81,46,59,.05) !important;
+}
+.guest-card::before { display: none !important; }
+.guest-icon {
+  position: relative !important;
+  width: 58px !important;
+  height: 54px !important;
+  flex: none !important;
+  border-radius: 15px 18px 14px 17px !important;
+  background: #fde0eb !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: rotate(-2deg);
+  box-shadow: inset 0 0 0 1px rgba(244,61,136,.06);
+}
+.guest-icon::before {
+  content: '';
+  position: absolute;
+  inset: 3px 5px auto -4px;
+  height: 9px;
+  background: rgba(255,255,255,.58);
+  transform: rotate(-8deg);
+  border-radius: 2px;
+}
+.guest-icon .doodle-icon {
+  position: relative;
+  z-index: 2;
+  width: 40px !important;
+  height: 40px !important;
+  stroke: var(--pink-hot) !important;
+  stroke-width: 2.2 !important;
+}
+.guest-card-copy {
+  min-width: 0 !important;
+  padding-left: 0 !important;
+  overflow: hidden;
+}
+.guest-card strong {
+  font-size: 19px !important;
+  line-height: 1.05 !important;
+  white-space: normal;
+}
+.guest-role {
+  margin-top: 3px !important;
+  color: var(--pink-hot) !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.guest-arrow {
+  position: static !important;
+  transform: none !important;
+  width: 24px !important;
+  height: 24px !important;
+  align-self: center;
+  justify-self: end;
+}
+
+/* More dimensional ripped-paper divider above guest list */
+.picker-divider {
+  margin-top: 0 !important;
+  box-shadow: 0 8px 0 rgba(247,185,208,.28);
+  filter: drop-shadow(0 5px 3px rgba(80,45,60,.06));
+}
+.picker-divider::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 18px;
+  bottom: -8px;
+  height: 14px;
+  background: #fffaf7;
+  clip-path: polygon(0 0,8% 55%,17% 8%,27% 65%,36% 10%,46% 60%,57% 2%,68% 64%,79% 8%,89% 59%,100% 4%,100% 100%,0 100%);
+}
+
+/* Soft pink rather than taupe on interactive surfaces */
+.time-pill { background: #f8c5d8 !important; }
+.muted-time { background: #f8e4ec !important; color: #9a7a86 !important; }
+.home-mission-feature,
+.mission-card { background: #fde1eb !important; }
+.identity-row { box-shadow: 3px 4px 0 #f5d2df !important; }
+
+/* Home mission has torn-paper depth while keeping rounded personality */
+.home-mission-feature {
+  border-radius: 22px !important;
+  box-shadow: 5px 6px 0 #f3bfd2, 0 10px 20px rgba(88,43,61,.06) !important;
+}
+.home-mission-feature::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 12px;
+  bottom: -7px;
+  height: 12px;
+  background: #fffaf7;
+  clip-path: polygon(0 30%,8% 4%,16% 45%,25% 8%,34% 47%,44% 1%,54% 42%,64% 8%,74% 50%,84% 3%,92% 46%,100% 12%,100% 100%,0 100%);
+  opacity: .78;
+}
+
+/* Rounded itinerary cards with depth */
+.timeline-row {
+  border-radius: 18px !important;
+  box-shadow: 3px 4px 0 #f3d6e1, 0 7px 14px rgba(70,40,50,.035) !important;
+}
+.time-pill { border-radius: 13px !important; }
+
+/* Leaderboard note areas: clear separation from doodles */
+.leaderboard-stack .paper-card,
+.leaderboard-note,
+.score-list {
+  position: relative;
+  z-index: 3;
+  border-radius: 20px !important;
+}
+
+@media (max-width: 430px) {
+  .bryana-note span { font-size: 59px !important; }
+  .guest-role { font-size: 16px !important; }
+  .menu-caption { font-size: 14px !important; }
+}
