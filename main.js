@@ -44,7 +44,7 @@ function icon(name) {
     itinerary: '🗓',
     mission: '💋',
     olympics: '◎',
-    quiz: '🧠',
+    quiz: '✏',
     gallery: '📷',
     rules: '♛',
     hits: '✦',
@@ -52,7 +52,7 @@ function icon(name) {
     cake: '🎂',
     house: '⌂',
     drinks: '🥂',
-    quizsmall: '🧠',
+    quizsmall: '✏',
     games: '🎲',
   };
   return map[name] || '✦';
@@ -87,8 +87,17 @@ function doodles() {
     <span class="doodle heart heart-b">♡</span>
     <span class="doodle star star-a">✦</span>
     <span class="doodle star star-b">✦</span>
-    <span class="doodle scribble scribble-a">⌇</span>
+    <span class="doodle squiggle squiggle-a">~</span>
+    <span class="doodle mini-cross mini-cross-a">×</span>
+    <span class="doodle paperclip paperclip-a">⌕</span>
   `;
+}
+
+function blockTitle(title, extraClass = '') {
+  const words = String(title).toUpperCase().split(/\s+/);
+  return `<div class="block-title ${extraClass}">${words.map((word) =>
+    `<span class="block-word">${[...word].map((letter) => `<span class="letter-block">${esc(letter)}</span>`).join('')}</span>`
+  ).join('')}</div>`;
 }
 
 function headerHome() {
@@ -98,14 +107,11 @@ function headerHome() {
       ${doodles()}
       <div class="date-kicker">SATURDAY 24 OCTOBER 2026</div>
       <div class="title-stack">
-        <div class="script-title">Bryana's</div>
-        <div class="ransom-wrap">
-          <span class="ransom big">DIVORCE</span>
-          <span class="ransom big">PARTY</span>
-        </div>
+        <div class="bryana-note"><span>Bryana's</span></div>
+        ${blockTitle('DIVORCE PARTY', 'hero-block-title')}
       </div>
-      <div class="tagline">Food, drinks &amp; zero regrets ♡</div>
-      <div class="black-strip">BLACK DRESS CODE</div>
+      <div class="tagline hand-note">Food, drinks &amp; zero regrets ♡</div>
+      <div class="black-strip">SATURDAY 24 OCTOBER 2026 <span>·</span> BLACK DRESS CODE</div>
     </section>
   `;
 }
@@ -116,10 +122,8 @@ function screenHeader(title, subtitle = '') {
     <div class="screen-header">
       <button class="back-link" data-go="home">${icon('back')} Back</button>
       ${doodles()}
-      <div class="screen-title-wrap">
-        <span class="ransom">${esc(title)}</span>
-      </div>
-      ${subtitle ? `<div class="screen-subtitle">${subtitle}</div>` : ''}
+      <div class="screen-title-wrap">${blockTitle(title)}</div>
+      ${subtitle ? `<div class="screen-subtitle hand-note">${subtitle}</div>` : ''}
     </div>
   `;
 }
@@ -155,15 +159,21 @@ async function renderGuestPicker() {
     ${headerHome()}
     <section class="content-stack">
       ${infoCard(`
+        <div class="picker-stamp">CLASSIFIED GUEST LIST</div>
         <h2 class="card-heading">WHO ARE YOU?</h2>
-        <p class="hand-copy">Pick your name once. This phone will remember you.</p>
+        <p class="picker-copy">Find your classified file. This phone will remember you.</p>
+        <div class="guest-search-wrap"><span>⌕</span><input id="guestSearch" class="guest-search" type="search" placeholder="Search your name…" /></div>
         <button class="small-toggle" id="toggleTest">${state.testMode ? 'Disable' : 'Enable'} organizer test mode</button>
-      `, 'intro-card')}
-      <div class="guest-list">
-        ${(data || []).map((g) => `
-          <button class="guest-card" data-guest="${g.slug}">
+      `, 'intro-card guest-intro')}
+      <div class="guest-list" id="guestList">
+        ${(data || []).map((g, index) => `
+          <button class="guest-card guest-card-${index % 4}" data-guest="${g.slug}">
+            <span class="guest-tape"></span>
+            <span class="guest-number">FILE ${String(index + 1).padStart(2, '0')}</span>
+            <span class="guest-file-label">CONFIDENTIAL</span>
             <strong>${esc(g.name)}</strong>
-            <span>${esc(g.title || 'CLASSIFIED FILE')}</span>
+            <span class="guest-role">${esc(g.title || 'CLASSIFIED FILE')}</span>
+            <span class="guest-arrow">→</span>
           </button>
         `).join('')}
       </div>
@@ -176,6 +186,13 @@ async function renderGuestPicker() {
       renderHome();
     };
   });
+  const guestSearch = document.getElementById('guestSearch');
+  guestSearch.oninput = () => {
+    const q = guestSearch.value.trim().toLowerCase();
+    document.querySelectorAll('[data-guest]').forEach((btn) => {
+      btn.style.display = btn.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  };
   document.getElementById('toggleTest').onclick = () => {
     setTestMode(!state.testMode);
     renderGuestPicker();
@@ -198,6 +215,13 @@ async function renderHome() {
         <button class="linkish" id="switchGuest">Switch</button>
       </div>
 
+      <div class="home-mission-feature">
+        <span class="home-mission-tape"></span>
+        <div class="home-mission-kicker">YOUR MISSION FOR THE DAY</div>
+        <div class="home-mission-text">${esc(guest.mission_text || 'Your classified mission is being finalised.')}</div>
+        <button class="home-mission-action" data-go="mission">Open mission →</button>
+      </div>
+
       <div class="menu-list">
         ${menuButton('home', 'Home', 'Main menu', 'home')}
         ${menuButton('itinerary', 'Itinerary', 'The plan (so far...)', 'itinerary')}
@@ -217,35 +241,76 @@ async function renderHome() {
 }
 
 function timelineIcon(title = '') {
-  const t = title.toLowerCase();
-  if (t.includes('cake')) return 'cake';
-  if (t.includes('hq') || t.includes('house')) return 'house';
-  if (t.includes('food') || t.includes('snack')) return 'drinks';
-  if (t.includes('quiz')) return 'quizsmall';
-  if (t.includes('game')) return 'games';
-  return 'itinerary';
+  const t = String(title).toLowerCase();
+  if (t.includes('brunch')) return '🍴';
+  if (t.includes('little orange door')) return '💋';
+  if (t.includes('simmons')) return '🍸';
+  if (t.includes('hq') || t.includes('house')) return '⌂';
+  if (t.includes('sit with us') || t.includes('dinner') || t.includes('snack')) return '🥤';
+  if (t.includes('pop quiz') || t.includes('bryana files')) return '✏️';
+  if (t.includes('cake')) return '🎂';
+  if (t.includes('archer')) return '♬';
+  return '✦';
+}
+
+function startTimeOnly(label = '') {
+  return String(label).split(/[–—-]/)[0].trim();
 }
 
 async function renderItinerary() {
+  const guest = await getCurrentGuest();
   const { data } = await supabase.from('itinerary_items').select('*').order('sort_order');
+  const rows = data || [];
+  const isBryana = guest?.slug === 'bryana';
+
+  const partyDate = '2026-10-24';
+  const now = new Date();
+  const londonParts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(now).reduce((acc, part) => ({ ...acc, [part.type]: part.value }), {});
+  const londonDate = `${londonParts.year}-${londonParts.month}-${londonParts.day}`;
+  const londonMinutes = Number(londonParts.hour) * 60 + Number(londonParts.minute);
+
+  const isUnlockedForBryana = (item, index) => {
+    if (!isBryana) return true;
+    if (index === 0) return true;
+    if (londonDate > partyDate) return true;
+    if (londonDate < partyDate) return false;
+    const match = String(item.time_label || '').match(/(\d{1,2}):(\d{2})/);
+    if (!match) return false;
+    const itemMinutes = Number(match[1]) * 60 + Number(match[2]);
+    return londonMinutes >= itemMinutes;
+  };
+
   shell(`
-    ${screenHeader('ITINERARY', 'The plan (so far...)')}
+    ${screenHeader('ITINERARY', isBryana ? 'Classified until it is time…' : 'The plan (so far...)')}
     <section class="content-stack">
+      ${isBryana ? '<div class="classified-intro"><span>TOP SECRET</span> Your next stop reveals itself as the day unfolds.</div>' : ''}
       <div class="timeline-card">
-        ${(data || []).map((item) => `
-          <div class="timeline-row">
-            <div class="time-pill">${esc(item.time_label)}</div>
-            <div class="timeline-copy">
-              <div class="timeline-title">${esc(item.title)}</div>
-              ${item.subtitle ? `<div class="timeline-sub">${esc(item.subtitle)}</div>` : ''}
+        ${rows.map((item, index) => {
+          const unlocked = isUnlockedForBryana(item, index);
+          if (unlocked) return `
+            <div class="timeline-row">
+              <div class="time-pill">${esc(startTimeOnly(item.time_label))}</div>
+              <div class="timeline-copy">
+                <div class="timeline-title">${esc(item.title)}</div>
+                ${item.subtitle ? `<div class="timeline-sub">${esc(item.subtitle)}</div>` : ''}
+                ${item.location && item.location !== item.title ? `<div class="timeline-location">${esc(item.location)}</div>` : ''}
+              </div>
+              <div class="timeline-right"><span class="itinerary-icon">${timelineIcon(item.title)}</span></div>
             </div>
-            <div class="timeline-right">${icon(timelineIcon(item.title))}</div>
-          </div>
-        `).join('')}
-      </div>
-      <div class="locked-note">
-        <span class="lock-badge">🔒</span>
-        Next location reveal is Bryana-only.
+          `;
+          return `
+            <div class="timeline-row timeline-locked">
+              <div class="time-pill muted-time">${esc(startTimeOnly(item.time_label))}</div>
+              <div class="timeline-copy">
+                <div class="timeline-title">CLASSIFIED</div>
+                <div class="timeline-sub">Unlocks at ${esc(startTimeOnly(item.time_label))}</div>
+              </div>
+              <div class="timeline-right"><span class="itinerary-icon">🔒</span></div>
+            </div>
+          `;
+        }).join('')}
       </div>
     </section>
   `);
@@ -259,10 +324,10 @@ async function renderMission() {
   shell(`
     ${screenHeader('YOUR MISSION', "You've been assigned ONE mission.")}
     <section class="content-stack">
-      <div class="center-note">Complete it before the end of the night.</div>
+      <div class="mission-instruction">Complete it before the end of the night.</div>
       <div class="mission-card">
         <div class="mission-icon">👥</div>
-        <div class="mission-copy">${esc(missionText)}</div>
+        <div class="mission-copy sans-copy">${esc(missionText)}</div>
       </div>
       <div class="upload-wrap">
         <label class="upload-label">UPLOAD PHOTO &amp; COMPLETE MISSION</label>
@@ -336,6 +401,10 @@ async function renderQuizLanding() {
   const guest = await getCurrentGuest();
   if (!guest) return renderGuestPicker();
 
+  if (!guest.can_play_quiz) {
+    return renderLeaderboard('Spectator mode: watch the chaos unfold. No quiz for you.');
+  }
+
   const { data: existingAttempt } = await supabase
     .from('quiz_attempts')
     .select('*')
@@ -346,23 +415,21 @@ async function renderQuizLanding() {
     return renderLeaderboard('Your score is already locked in.');
   }
 
-  const canPreviewOnly = !guest.can_play_quiz;
-
   shell(`
     ${screenHeader('BRYANA FILES', 'How well do you know Bryana?')}
     <section class="content-stack">
       ${infoCard(`
         <div class="quiz-intro">
-          <div class="timer-chip">⏱ Fastest + most correct wins</div>
-          <p class="hand-copy">${state.testMode ? 'You are in Test Mode. Results will not be saved.' : (canPreviewOnly ? 'Organizer preview only. This version will not be saved.' : 'Ready? Your result locks once submitted.')}</p>
-          <button class="primary-button" id="startQuiz">${state.testMode || canPreviewOnly ? 'Preview the quiz' : 'Start quiz'}</button>
+          <div class="timer-chip">✏️ Most correct + fastest wins</div>
+          <p class="plain-note">${state.testMode ? 'You are in Test Mode. Results will not be saved.' : 'Ready? Your result locks once submitted.'}</p>
+          <button class="primary-button" id="startQuiz">${state.testMode ? 'Preview the quiz' : 'Start quiz'}</button>
           <button class="secondary-button" id="viewBoard">View leaderboard</button>
         </div>
       `)}
     </section>
   `);
 
-  document.getElementById('startQuiz').onclick = () => startQuiz(state.testMode || canPreviewOnly);
+  document.getElementById('startQuiz').onclick = () => startQuiz(state.testMode);
   document.getElementById('viewBoard').onclick = () => renderLeaderboard();
 }
 
@@ -451,7 +518,7 @@ async function finishQuiz() {
       <section class="content-stack">
         ${infoCard(`
           <div class="result-big">${correct}/${state.questions.length}</div>
-          <p class="hand-copy">This was a preview only. The live leaderboard was not affected.</p>
+          <p class="plain-note">This was a preview only. The live leaderboard was not affected.</p>
           <button class="primary-button" data-go="quiz">Back to quiz</button>
         `)}
       </section>
@@ -516,6 +583,8 @@ function formatMs(ms) {
 }
 
 async function renderGallery() {
+  const guest = await getCurrentGuest();
+  if (!guest) return renderGuestPicker();
   const { data } = await supabase.from('party_photos').select('*').order('created_at', { ascending: false }).limit(60);
   const photos = (data || []).map((p) => ({
     ...p,
@@ -523,8 +592,14 @@ async function renderGallery() {
   }));
 
   shell(`
-    ${screenHeader('GALLERY', 'The shared camera roll')}
+    ${screenHeader('GALLERY', 'Receipts or it didn’t happen')}
     <section class="content-stack">
+      <div class="gallery-upload-card">
+        <div class="gallery-upload-title">ADD TO THE RECEIPTS</div>
+        <input id="galleryFile" type="file" accept="image/*" />
+        <input id="galleryCaption" class="caption-input" maxlength="80" placeholder="Caption (optional)" />
+        <button class="primary-button" id="galleryUpload">Upload photo</button>
+      </div>
       ${photos.length ? `<div class="gallery-grid">${photos.map((photo) => `
         <a class="gallery-item" href="${photo.url}" target="_blank" rel="noreferrer">
           <img src="${photo.url}" alt="Party upload" />
@@ -532,6 +607,30 @@ async function renderGallery() {
       `).join('')}</div>` : infoCard('<div class="empty-state">No uploads yet. Go create the evidence.</div>')}
     </section>
   `);
+
+  document.getElementById('galleryUpload').onclick = async () => {
+    const file = document.getElementById('galleryFile').files?.[0];
+    const caption = document.getElementById('galleryCaption').value.trim();
+    if (!file) return toast('Choose a photo first');
+    try {
+      const compressed = await compress(file);
+      const path = `gallery/${guest.slug}-${Date.now()}.jpg`;
+      const { error } = await supabase.storage.from('party-photos').upload(path, compressed, {
+        contentType: compressed.type || 'image/jpeg',
+      });
+      if (error) throw error;
+      await supabase.from('party_photos').insert({
+        guest_slug: guest.slug,
+        category: 'gallery',
+        storage_path: path,
+        caption: caption || null,
+      });
+      toast('Receipt added ✓');
+      renderGallery();
+    } catch (err) {
+      toast(`Upload failed: ${err.message}`);
+    }
+  };
 }
 
 async function renderRules() {
