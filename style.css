@@ -1234,3 +1234,6 @@ body {
   .guest-role { font-size: 16px !important; }
   .menu-caption { font-size: 14px !important; }
 }
+
+/* Search-filtered guest cards must remain hidden despite display styling. */
+.guest-list .guest-card[hidden] { display: none !important; }
