@@ -288,77 +288,36 @@ function startTimeOnly(label = '') {
 
 async function renderItinerary() {
   const guest = await getCurrentGuest();
-  const { data } = await supabase.from('itinerary_items').select('*').order('sort_order');
-  const rows = data || [];
   const isBryana = guest?.slug === 'bryana';
-
-  const partyDate = '2026-10-24';
-  const now = new Date();
-  const londonParts = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false,
-  }).formatToParts(now).reduce((acc, part) => ({ ...acc, [part.type]: part.value }), {});
-  let londonDate = `${londonParts.year}-${londonParts.month}-${londonParts.day}`;
-  let londonMinutes = Number(londonParts.hour) * 60 + Number(londonParts.minute);
-
-  if (state.testMode && isBryana && state.itineraryPreviewTime !== 'live') {
-    londonDate = partyDate;
-    const [h, m] = state.itineraryPreviewTime.split(':').map(Number);
-    londonMinutes = h * 60 + m;
-  }
-
-  const isUnlockedForBryana = (item, index) => {
-    if (!isBryana) return true;
-    if (index === 0) return true;
-    if (londonDate > partyDate) return true;
-    if (londonDate < partyDate) return false;
-    const match = String(item.time_label || '').match(/(\d{1,2}):(\d{2})/);
-    if (!match) return false;
-    const itemMinutes = Number(match[1]) * 60 + Number(match[2]);
-    return londonMinutes >= itemMinutes;
-  };
-
+  // Final party poster schedule, 24 October 2026.
+  const rows = [
+    { time: '12:15 PM', title: 'Letter drop-off', subtitle: 'Girls arrive early at No 32 The Old Town to hand Margaux their letters.' },
+    { time: '12:30 PM', title: 'No 32 The Old Town', subtitle: "Bottomless brunch. Bryana's Freedom Olympics begin." },
+    { time: '2:45 PM', title: 'The Little Orange Door', subtitle: 'Drinks, good vibes and missions.' },
+    { time: '4:00 PM', title: 'Simmons Clapham (optional)', subtitle: "Download the app and spin their wheel for a free drink (if you're lucky)." },
+    { time: '5:00 PM', title: 'Head to Plastics HQ', subtitle: "Maddie's house. Food, drinks, games and surprises." },
+    { time: '6:00 PM', title: 'You CAN Sit With Us', subtitle: 'Themed dinner and snacks.' },
+    { time: '6:30 PM', title: 'Pop Quiz Time, Losers', subtitle: 'The Bryana Files.' },
+    { time: '7:00 PM', title: 'Evening people join', subtitle: "Come as you are — night's still young!" },
+    { time: '8:30 PM', title: 'Leave for Archer Street', subtitle: isBryana ? 'The night continues. More surprises await!' : 'Surprise cake and a night out!' },
+  ];
   shell(`
-    ${screenHeader('ITINERARY', isBryana ? 'Classified until it is time…' : 'The plan (so far...)')}
+    ${screenHeader('ITINERARY', 'Saturday 24 October 2026')}
     <section class="content-stack">
-      ${isBryana ? `<div class="classified-intro"><span>TOP SECRET</span> Your next stop reveals itself as the day unfolds.</div>${state.testMode ? `<div class="time-preview-control"><label for="itineraryPreview">TEST UNLOCK TIME</label><select id="itineraryPreview"><option value="live">Live time</option>${rows.map(i => `<option value="${esc(startTimeOnly(i.time_label))}">${esc(startTimeOnly(i.time_label))}</option>`).join('')}</select><small>Use this to preview exactly what Bryana will see at each point in the day.</small></div>` : ''}` : ''}
       <div class="timeline-card">
-        ${rows.map((item, index) => {
-          const unlocked = isUnlockedForBryana(item, index);
-          if (unlocked) return `
-            <div class="timeline-row">
-              <div class="time-pill">${esc(startTimeOnly(item.time_label))}</div>
-              <div class="timeline-copy">
-                <div class="timeline-title">${esc(item.title)}</div>
-                ${item.subtitle ? `<div class="timeline-sub">${esc(item.subtitle)}</div>` : ''}
-                ${item.location && item.location !== item.title ? `<div class="timeline-location">${esc(item.location)}</div>` : ''}
-              </div>
-              <div class="timeline-right"><span class="itinerary-icon">${timelineIcon(item.title)}</span></div>
+        ${rows.map(item => `
+          <div class="timeline-row">
+            <div class="time-pill">${esc(item.time)}</div>
+            <div class="timeline-copy">
+              <div class="timeline-title">${esc(item.title)}</div>
+              <div class="timeline-sub">${esc(item.subtitle)}</div>
             </div>
-          `;
-          return `
-            <div class="timeline-row timeline-locked">
-              <div class="time-pill muted-time">${esc(startTimeOnly(item.time_label))}</div>
-              <div class="timeline-copy">
-                <div class="timeline-title">CLASSIFIED</div>
-                <div class="timeline-sub">Unlocks at ${esc(startTimeOnly(item.time_label))}</div>
-              </div>
-              <div class="timeline-right"><span class="itinerary-icon">${icon('lock')}</span></div>
-            </div>
-          `;
-        }).join('')}
+            <div class="timeline-right"><span class="itinerary-icon">${timelineIcon(item.title)}</span></div>
+          </div>
+        `).join('')}
       </div>
     </section>
   `);
-
-  const preview = document.getElementById('itineraryPreview');
-  if (preview) {
-    preview.value = state.itineraryPreviewTime;
-    preview.onchange = () => {
-      state.itineraryPreviewTime = preview.value;
-      localStorage.setItem('party_itinerary_preview_time', preview.value);
-      renderItinerary();
-    };
-  }
 }
 
 async function renderMission() {
@@ -744,7 +703,6 @@ async function route(name) {
     quiz: renderQuizLanding,
     gallery: renderGallery,
     rules: renderRules,
-    hits: renderHits,
   };
   const fn = routes[name] || renderHome;
   return fn();
