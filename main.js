@@ -369,7 +369,7 @@ function challengeStatus(row, index) {
   const raw = (row.status || row.progress_status || '').toLowerCase();
   if (raw.includes('lock')) return { label: 'Locked', className: 'locked', icon: icon('lock') };
   if (raw.includes('complete') || row.is_completed || row.completed_at) return { label: 'Completed', className: 'complete', icon: '✓' };
-  return { label: index === 0 ? 'Completed' : 'In progress', className: index === 0 ? 'complete' : 'progress', icon: index === 0 ? '✓' : '•' };
+  return { label: 'In progress', className: 'progress', icon: '•' };
 }
 
 async function renderOlympics() {
@@ -440,6 +440,7 @@ async function renderQuizLanding() {
 async function startQuiz(preview = false) {
   const { data } = await supabase.from('quiz_questions').select('*').order('sort_order');
   state.questions = (data || []).map((q) => ({ ...q, shown: shuffle([...(q.options || [])]) }));
+  if (!state.questions.length) { toast('Quiz questions are unavailable. Please try again.'); return; }
   state.answers = {};
   state.startedAt = Date.now();
   state.preview = !!preview;
@@ -561,16 +562,16 @@ async function renderLeaderboard(message = '') {
       ${message ? infoCard(`<strong>${esc(message)}</strong>`) : ''}
       ${top.length ? `
         <div class="podium-grid">
-          ${top[1] ? `<div class="podium-card silver"><div class="medal">2</div><div class="podium-name">${esc(top[1].guests?.name || top[1].guest_slug)}</div><div class="podium-score">${top[1].correct_count}/20 • ${formatMs(top[1].total_ms)}</div></div>` : '<div></div>'}
-          ${top[0] ? `<div class="podium-card gold winner"><div class="medal">1</div><div class="podium-name">${esc(top[0].guests?.name || top[0].guest_slug)}</div><div class="podium-score">${top[0].correct_count}/20 • ${formatMs(top[0].total_ms)}</div></div>` : ''}
-          ${top[2] ? `<div class="podium-card bronze"><div class="medal">3</div><div class="podium-name">${esc(top[2].guests?.name || top[2].guest_slug)}</div><div class="podium-score">${top[2].correct_count}/20 • ${formatMs(top[2].total_ms)}</div></div>` : '<div></div>'}
+          ${top[1] ? `<div class="podium-card silver"><div class="medal">2</div><div class="podium-name">${esc(top[1].guests?.name || top[1].guest_slug)}</div><div class="podium-score">${top[1].correct_count}/${state.questions.length || 20} • ${formatMs(top[1].total_ms)}</div></div>` : '<div></div>'}
+          ${top[0] ? `<div class="podium-card gold winner"><div class="medal">1</div><div class="podium-name">${esc(top[0].guests?.name || top[0].guest_slug)}</div><div class="podium-score">${top[0].correct_count}/${state.questions.length || 20} • ${formatMs(top[0].total_ms)}</div></div>` : ''}
+          ${top[2] ? `<div class="podium-card bronze"><div class="medal">3</div><div class="podium-name">${esc(top[2].guests?.name || top[2].guest_slug)}</div><div class="podium-score">${top[2].correct_count}/${state.questions.length || 20} • ${formatMs(top[2].total_ms)}</div></div>` : '<div></div>'}
         </div>
       ` : ''}
       <div class="leader-list">
         ${rest.length ? rest.map((row, idx) => `
           <div class="leader-row">
             <span>${idx + 4}. ${esc(row.guests?.name || row.guest_slug)}</span>
-            <strong>${row.correct_count}/20 • ${formatMs(row.total_ms)}</strong>
+            <strong>${row.correct_count}/${state.questions.length || 20} • ${formatMs(row.total_ms)}</strong>
           </div>
         `).join('') : infoCard('<div class="empty-state">No scores yet. Suspicious.</div>')}
       </div>
@@ -638,7 +639,7 @@ async function renderGallery() {
 }
 
 async function renderRules() {
-  const { data } = await supabase.from('regina_rules').select('*').order('sort_order');
+  const { data } = await supabase.from('reginas_rules').select('*').order('sort_order');
   shell(`
     ${screenHeader("REGINA'S RULES", 'The laws of the land.')}
     <section class="content-stack">
