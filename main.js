@@ -755,4 +755,6 @@ async function route(name) {
   return fn();
 }
 
-route(localStorage.getItem('party_guest') ? 'home' : 'pick');
+// Always start a fresh link visit on the guest-selection welcome screen.
+// Guest choice is stored only in this browser, never shared with other devices.
+route('pick');
