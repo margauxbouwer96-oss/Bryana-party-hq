@@ -549,10 +549,12 @@ async function finishQuiz() {
         ${infoCard(`
           <div class="result-big">${correct}/${state.questions.length}</div>
           <p class="plain-note">This was a preview only. The live leaderboard was not affected.</p>
-          <button class="primary-button" data-go="quiz">Back to quiz</button>
+          <button class="primary-button" id="previewLeaderboard">View leaderboard</button>
+          <button class="secondary-button" data-go="quiz">Back to quiz</button>
         `)}
       </section>
     `);
+    document.getElementById('previewLeaderboard').onclick = () => renderLeaderboard('Organizer preview complete. No score was saved.');
     return;
   }
 
@@ -598,7 +600,7 @@ async function renderLeaderboard(message = '') {
             <span>${idx + 4}. ${esc(row.guests?.name || row.guest_slug)}</span>
             <strong>${row.correct_count}/${state.questions.length || 20} • ${formatMs(row.total_ms)}</strong>
           </div>
-        `).join('') : infoCard('<div class="empty-state">No scores yet. Suspicious.</div>')}
+        `).join('') : !top.length ? infoCard('<div class="empty-state">No scores yet. Be the first to make the Plastics leaderboard!</div>') : ''}
       </div>
       <div class="center-note">Well done, legends!</div>
     </section>
