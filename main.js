@@ -104,13 +104,7 @@ function shell(inner, options = {}) {
 }
 
 function topChrome() {
-  return `
-    <div class="phone-chrome">
-      <span>9:41</span>
-      <span class="island"></span>
-      <span>⌁</span>
-    </div>
-  `;
+  return '';
 }
 
 function doodles() {
