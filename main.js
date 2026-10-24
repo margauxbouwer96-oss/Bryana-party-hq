@@ -219,7 +219,7 @@ async function renderGuestPicker() {
   guestSearch.oninput = () => {
     const q = guestSearch.value.trim().toLowerCase();
     document.querySelectorAll('[data-guest]').forEach((btn) => {
-      btn.style.display = btn.textContent.toLowerCase().includes(q) ? '' : 'none';
+      btn.hidden = !btn.querySelector('.guest-card-copy strong')?.textContent.toLowerCase().includes(q);
     });
   };
   document.getElementById('toggleTest').onclick = () => {
