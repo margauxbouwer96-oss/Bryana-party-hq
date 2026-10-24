@@ -232,6 +232,14 @@ async function renderHome() {
   const guest = await getCurrentGuest();
   if (!guest) return renderGuestPicker();
 
+  const { data: recentPhotos } = await supabase.from('party_photos')
+    .select('storage_path, guest_slug, caption')
+    .order('created_at', { ascending: false }).limit(5);
+  const latestPhotos = (recentPhotos || []).map(photo => ({
+    ...photo,
+    url: supabase.storage.from('party-photos').getPublicUrl(photo.storage_path).data.publicUrl,
+  }));
+
   shell(`
     ${headerHome()}
     <section class="content-stack home-stack">
@@ -259,6 +267,15 @@ async function renderHome() {
         ${menuButton('gallery', 'Gallery', 'Receipts or it didn’t happen', 'gallery')}
         ${menuButton('rules', "Regina's Rules", 'Obey or face consequences', 'rules')}
       </div>
+      <section class="latest-receipts" aria-label="Latest party photos">
+        <div class="latest-receipts-heading">LATEST RECEIPTS 📸</div>
+        <p class="latest-receipts-subtitle">The five freshest pieces of evidence.</p>
+        ${latestPhotos.length ? `<div class="latest-receipts-grid">${latestPhotos.map(photo => `
+          <a href="${esc(photo.url)}" target="_blank" rel="noopener noreferrer" aria-label="View party photo">
+            <img src="${esc(photo.url)}" alt="Latest party photo" loading="lazy" />
+          </a>`).join('')}</div>` : '<p class="latest-receipts-empty">No receipts yet. Be the first to spill the tea.</p>'}
+        <button class="latest-receipts-all" data-go="gallery">View full gallery →</button>
+      </section>
     </section>
   `);
 
