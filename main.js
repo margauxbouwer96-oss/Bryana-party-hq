@@ -300,11 +300,20 @@ async function renderItinerary() {
     { time: '7:00 PM', title: 'Evening people join', subtitle: "Come as you are — night's still young!" },
     { time: '8:30 PM', title: 'Leave for Archer Street', subtitle: isBryana ? 'The night continues. More surprises await!' : 'Surprise cake and a night out!' },
   ];
+  const eveningOnly = ['joe', 'charlie', 'jon', 'steve'].includes(guest?.slug);
+  const visibleRows = eveningOnly ? rows.filter(item => item.time === '7:00 PM' || item.time === '8:30 PM') : rows;
+  if (eveningOnly) {
+    const arrival = visibleRows.find(item => item.time === '7:00 PM');
+    if (arrival) {
+      arrival.title = 'Arrive at Plastics HQ';
+      arrival.subtitle = "Maddie's house. Join the Plastics for drinks, games and the evening celebrations!";
+    }
+  }
   shell(`
     ${screenHeader('ITINERARY', 'Saturday 24 October 2026')}
     <section class="content-stack">
       <div class="timeline-card">
-        ${rows.map(item => `
+        ${visibleRows.map(item => `
           <div class="timeline-row">
             <div class="time-pill">${esc(item.time)}</div>
             <div class="timeline-copy">
