@@ -1237,3 +1237,13 @@ body {
 
 /* Search-filtered guest cards must remain hidden despite display styling. */
 .guest-list .guest-card[hidden] { display: none !important; }
+
+/* Latest gallery receipts preview on the home screen. */
+.latest-receipts { margin-top: 20px; padding: 16px 12px 18px; background: #fffafc; border: 1px solid #f0d7e0; border-radius: 15px; box-shadow: 3px 4px 0 #f5d3df; }
+.latest-receipts-heading { font: 900 18px/1.2 Arial, Helvetica, sans-serif; letter-spacing: .045em; color: #161016; }
+.latest-receipts-subtitle { margin: 6px 0 13px; font: 14px/1.35 Arial, Helvetica, sans-serif; color: #6c5360; }
+.latest-receipts-grid { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 6px; }
+.latest-receipts-grid a { display: block; aspect-ratio: 1; overflow: hidden; border-radius: 7px; border: 1px solid #e6cbd6; background: #f8e7ee; }
+.latest-receipts-grid img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.latest-receipts-empty { font: 14px/1.4 Arial, Helvetica, sans-serif; color: #6c5360; }
+.latest-receipts-all { display: block; margin: 14px 0 0 auto; border: 0; padding: 9px 12px; border-radius: 9px; background: #151015; color: #fff; font: 700 13px Arial, Helvetica, sans-serif; cursor: pointer; }
