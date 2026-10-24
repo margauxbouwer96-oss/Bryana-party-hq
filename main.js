@@ -255,7 +255,6 @@ async function renderHome() {
         ${menuButton('home', 'Home', 'Main menu', 'home')}
         ${menuButton('itinerary', 'Itinerary', 'The plan (so far...)', 'itinerary')}
         ${menuButton('mission', 'Your Mission', 'One mission. No excuses.', 'mission')}
-        ${menuButton('olympics', 'Freedom Olympics', "Bryana's challenges", 'olympics')}
         ${menuButton('quiz', 'Bryana Files', 'Quiz & leaderboard', 'quiz')}
         ${menuButton('gallery', 'Gallery', 'Receipts or it didn’t happen', 'gallery')}
         ${menuButton('rules', "Regina's Rules", 'Obey or face consequences', 'rules')}
