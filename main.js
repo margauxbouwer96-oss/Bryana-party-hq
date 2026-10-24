@@ -441,7 +441,25 @@ async function renderQuizLanding() {
     .maybeSingle();
 
   if (existingAttempt && !state.testMode) {
-    return renderLeaderboard('Your score is already locked in.');
+    return renderLeaderboard(`Your final score: ${existingAttempt.correct_count}/20 • ${formatMs(existingAttempt.total_ms)}. Your result is locked in.`);
+  }
+
+  const previewKey = `party_quiz_preview_${guest.slug}`;
+  const savedPreview = state.testMode ? JSON.parse(sessionStorage.getItem(previewKey) || 'null') : null;
+  if (savedPreview) {
+    shell(`
+      ${screenHeader('PREVIEW COMPLETE', 'Your quiz result is ready.')}
+      <section class="content-stack">
+        ${infoCard(`
+          <div class="result-big">${savedPreview.correct}/${savedPreview.total}</div>
+          <p class="plain-note">Time: ${formatMs(savedPreview.totalMs)}. Organizer test only — no score was saved to the leaderboard.</p>
+          <button class="primary-button" id="previewLeaderboard">View leaderboard</button>
+          <button class="secondary-button" data-go="home">Back to home</button>
+        `)}
+      </section>
+    `);
+    document.getElementById('previewLeaderboard').onclick = () => renderLeaderboard('Organizer preview complete. No score was saved.');
+    return;
   }
 
   shell(`
@@ -543,6 +561,7 @@ async function finishQuiz() {
   const totalMs = Date.now() - state.startedAt;
 
   if (state.preview || state.testMode) {
+    sessionStorage.setItem(`party_quiz_preview_${guest.slug}`, JSON.stringify({ correct, total: state.questions.length, totalMs }));
     shell(`
       ${screenHeader('PREVIEW COMPLETE', 'Nothing was submitted.')}
       <section class="content-stack">
